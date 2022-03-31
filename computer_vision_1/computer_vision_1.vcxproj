@@ -140,10 +140,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Downloads\pr1.cpp" />
+    <ClCompile Include="pr1.cpp" />
+    <ClCompile Include="src.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\coin.bmp" />
     <Image Include="..\LENNA.bmp" />
+    <Image Include="coin.bmp" />
+    <Image Include="LENNA.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Ahistogram.txt" />
+    <Text Include="histogram.txt" />
+    <Text Include="NormSum.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

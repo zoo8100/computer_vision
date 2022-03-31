@@ -18,6 +18,12 @@
     <ClCompile Include="..\..\..\..\Downloads\pr1.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="pr1.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\coin.bmp">
@@ -26,5 +32,22 @@
     <Image Include="..\LENNA.bmp">
       <Filter>소스 파일</Filter>
     </Image>
+    <Image Include="coin.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+    <Image Include="LENNA.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Ahistogram.txt">
+      <Filter>소스 파일</Filter>
+    </Text>
+    <Text Include="histogram.txt">
+      <Filter>소스 파일</Filter>
+    </Text>
+    <Text Include="NormSum.txt">
+      <Filter>소스 파일</Filter>
+    </Text>
   </ItemGroup>
 </Project>

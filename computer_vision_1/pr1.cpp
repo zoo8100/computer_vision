@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Windows.h>
-void main()
+void main_()
 {
 	BITMAPFILEHEADER hf; // BMP 파일헤더 14Bytes
 	BITMAPINFOHEADER hInfo; // BMP 인포헤더 40Bytes
