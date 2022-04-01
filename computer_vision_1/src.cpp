@@ -66,7 +66,7 @@ void ObtainAHistogram(int* Histo, int* AHisto)
 	fclose(fp);*/
 }
 
-void HistogramStretching(BYTE* Img, BYTE* Out, int * Histo, int W, int H,double *low_double,double *high_double)
+void HistogramStretching(BYTE* Img, BYTE* Out, int * Histo, int W, int H)
 {
 	int ImgSize = W * H;
 	BYTE Low, High;
@@ -86,8 +86,7 @@ void HistogramStretching(BYTE* Img, BYTE* Out, int * Histo, int W, int H,double 
 	for (int i = 0; i < ImgSize; i++) {
 		Out[i] = (BYTE)((Img[i] - Low) / (double)(High - Low) * 255.0);
 	}
-	*low_double = (double)Low;
-	*high_double = (double)High;
+
 }
 void HistogramEqualization(BYTE* Img, BYTE* Out, int* AHisto, int W, int H)
 {
@@ -107,38 +106,42 @@ void HistogramEqualization(BYTE* Img, BYTE* Out, int* AHisto, int W, int H)
 	}
 }
 
-void Binarization(BYTE * Img, BYTE * Out, int W, int H, BYTE Threshold)
+void Binarization(BYTE * Img, BYTE * Out, int W, int H, double Threshold)
 {
 	int ImgSize = W * H;
 	for (int i = 0; i < ImgSize; i++) {
-		if (Img[i] < Threshold) Out[i] = 0;
+		if (Img[i] < (int)Threshold) Out[i] = 0;
 		else Out[i] = 255;
 	}
 }
 //4주차 과제
-int GozalezBinThresh(int Threshold,int ThresNext, int* Histo, double low_double, double high_double)
+
+double GozalezBinThresh(double Threshold, int* Histo, int epsilon, BYTE Low, BYTE High)
 {
 	//오차
-	double low_sum, low_pixel_num, high_sum, high_pixel_num, G2Avg, G1Avg;
-	double val;
-	for (int i = low_double; i < (BYTE)Threshold; i++) {
+	double low_sum=0, low_pixel_num=0, high_sum=0, high_pixel_num=0, G2Avg, G1Avg;
+	int ThresNext;
+	double diff;
+	double ThresDouble;
+	ThresDouble = (double)Threshold;
+
+	for (int i = (double)Low; i < Threshold; i++) {
 		if (Histo[i] != 0) {
 			low_sum += i;
 			low_pixel_num += Histo[i];
 		}
 	}
-	for (int i = high_double; i > (BYTE)Threshold; i--) {
+	for (int i = (double)High; i > Threshold; i--) {
 		if (Histo[i] != 0) {
 			high_sum += i;
 			high_pixel_num += Histo[i];
 		}
 	}
+
 	G2Avg = low_sum / low_pixel_num;
 	G1Avg = high_sum / high_pixel_num;
-
-	Threshold = (G2Avg + G1Avg) / 2;
-	val = Threshold - ThresNext;
-	return val;
+	ThresNext= (G2Avg + G1Avg) / 2;
+	return ThresNext;
 }
 
 int main()
@@ -163,22 +166,35 @@ int main()
 
 	int Histo[256] = { 0 };
 	int AHisto[256] = { 0 };
-	double low_double;
-	double high_double;
+	int epsilon=3;
+	BYTE High;
+	BYTE Low;
+	double Threshold;
+	double diff;
+	double ThresNext;
 	ObtainHistogram(Image, Histo, hInfo.biWidth, hInfo.biHeight);
 	ObtainAHistogram(Histo, AHisto);
 	HistogramEqualization(Image, Output, AHisto, hInfo.biWidth, hInfo.biHeight);
 	//HistogramStretching(Image, Output, Histo, hInfo.biWidth, hInfo.biHeight);
-	int epsilon=3;
-	int Threshold = low_double + high_double / 2;
-	int ThresNext;
-	int diff;
+	for (int i = 0; i < 256; i++) {
+		if (Histo[i] != 0) {
+			Low = i;
+			break;
+		}
+	}
+	for (int i = 255; i >= 0; i--) {
+		if (Histo[i] != 0) {
+			High = i;
+			break;
+		}
+	}
+	Threshold = (double)(Low + High) / 2;
 	do {
-		diff = GozalezBinThresh(Threshold,ThresNext, Histo, low_double, high_double);
+		ThresNext = GozalezBinThresh(Threshold, Histo, epsilon, Low, High);
+		diff = Threshold - ThresNext;
 		Threshold = ThresNext;
 	} while (diff > epsilon);
 
-	//int GozalezBinThresh(BYTE * Img, int* ImgSize, BYTE * Low, BYTE * High, BYTE Threshold)
 	Binarization(Image, Output, hInfo.biWidth, hInfo.biHeight, Threshold);
 	//InverseImage(Image, Output, hInfo.biWidth, hInfo.biHeight);
 	//BrightnessAdj(Image, Output, hInfo.biWidth, hInfo.biHeight, -120);
