@@ -1,7 +1,37 @@
 #pragma warning(disable:4996)
 #include <stdio.h>
 #include <stdlib.h>
-#include <Windows.h>
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef unsigned int DWORD;
+typedef long LONG;
+typedef struct tagBITMAPFILEHEADER{
+WORD bfType;
+DWORD bfSize;
+WORD bfReserved1;
+WORD bfReserved2;
+DWORD bfoffBits;
+}BITMAPFILEHEADER;
+typedef struct tagBITMAPINFOHEADER{
+DWORD biSize;
+LONG biWidth;
+LONG biHeight;
+WORD biplanes;
+WORD biBitCount;
+DWORD biCompression;
+DWORD biSizeImage;
+LONG biXPelsPerMeter;
+LONG biYPelsPerMeter;
+DWORD biClrUsed;
+DWORD biClrImportant;
+}BITMAPINFOHEADER;
+typedef struct tagRGBQUAD{
+BYTE rgbBlue;
+BYTE rgbGreen;
+BYTE rgbRed;
+BYTE rgbReserved1;
+}RGBQUAD;
+
 void InverseImage(BYTE* Img, BYTE *Out, int W, int H)
 {
 	int ImgSize = W * H;
@@ -114,11 +144,11 @@ void Binarization(BYTE * Img, BYTE * Out, int W, int H, double Threshold)
 		else Out[i] = 255;
 	}
 }
-//4ÁÖÂ÷ °úÁ¦
+//4ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 double GozalezBinThresh(double Threshold, int* Histo, int epsilon, BYTE Low, BYTE High)
 {
-	//¿ÀÂ÷
+	//ï¿½ï¿½ï¿½ï¿½
 	double low_sum=0, low_pixel_num=0, high_sum=0, high_pixel_num=0, G2Avg, G1Avg;
 	int ThresNext;
 	double diff;
@@ -146,9 +176,9 @@ double GozalezBinThresh(double Threshold, int* Histo, int epsilon, BYTE Low, BYT
 
 int main()
 {
-	BITMAPFILEHEADER hf; // 14¹ÙÀÌÆ®
-	BITMAPINFOHEADER hInfo; // 40¹ÙÀÌÆ®
-	RGBQUAD hRGB[256]; // 1024¹ÙÀÌÆ®
+	BITMAPFILEHEADER hf; // 14ï¿½ï¿½ï¿½ï¿½Æ®
+	BITMAPINFOHEADER hInfo; // 40ï¿½ï¿½ï¿½ï¿½Æ®
+	RGBQUAD hRGB[256]; // 1024ï¿½ï¿½ï¿½ï¿½Æ®
 	FILE* fp;
 	fp = fopen("coin.bmp", "rb");
 	if (fp == NULL) {
