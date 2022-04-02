@@ -364,8 +364,11 @@ MigrationBackup/
 FodyWeavers.xsd
 
 #goorm.manifest
-goorm.manifest
-
+*.manifest
+#visual studio sln ignore
+*.sln
+*.vcxproj
+*.filters
 
 # Created by https://www.toptal.com/developers/gitignore/api/c,visualstudio,visualstudiocode,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=c,visualstudio,visualstudiocode,macos,windows
