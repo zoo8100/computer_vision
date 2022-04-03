@@ -34,7 +34,7 @@ BYTE rgbRed;
 BYTE rgbReserved1;
 }RGBQUAD;
 
-void Binarization(BYTE * Img, BYTE * Out, int ImgSize, int H, double Threshold)
+void Binarization(BYTE * Img, BYTE * Out, int ImgSize, double Threshold)
 {
 	for (int i = 0; i < ImgSize; i++) {
 		if (Img[i] < (int)Threshold) Out[i] = 0;
@@ -118,7 +118,8 @@ int main(){
 	BITMAPINFOHEADER hInfo; // 40BYTES
 	RGBQUAD hRGB[256]; // 1024BYTES
 	FILE* fp;
-	fp = fopen("/workspace/computer_vision_1/computer_vision_1/coin.bmp", "rb");
+	//fp = fopen("/workspace/computer_vision_1/computer_vision_1/coin.bmp", "rb");
+	fp = fopen("coin.bmp", "rb");
 	if (fp == NULL) {
 		printf("File not found!\n");
 		return -1;
@@ -147,9 +148,10 @@ int main(){
 	//GonzalezBinThresh calls itself recursively until it finds Threshold having diff smaller than epsilon 
 	Threshold = GonzalezBinThresh(Image, ImgSize, ThresholdInit, epsilon); 
 
-	Binarization(Image, Output, hInfo.biWidth, hInfo.biHeight, Threshold);
+	Binarization(Image, Output,ImgSize, Threshold);
 
-	fp = fopen("/workspace/computer_vision_1/computer_vision_1/output.bmp", "wb");
+	//fp = fopen("/workspace/computer_vision_1/computer_vision_1/output.bmp", "wb");
+	fp = fopen("output.bmp", "wb");
 	fwrite(&hf, sizeof(BYTE), sizeof(BITMAPFILEHEADER), fp);
 	fwrite(&hInfo, sizeof(BYTE), sizeof(BITMAPINFOHEADER), fp);
 	fwrite(hRGB, sizeof(RGBQUAD), 256, fp);
