@@ -157,6 +157,7 @@ double GozalezBinThresh(double Threshold, int * Histo, int epsilon, BYTE Low, BY
 
 	for (int i = (int)Low; i < Threshold; i++) {
 		if (Histo[i] != 0) {
+			printf("%d", i);
 			low_sum += i;
 			low_pixel_num += Histo[i];
 		}
@@ -211,13 +212,14 @@ int main()
 	ObtainAHistogram(Histo, AHisto);
 	HistogramEqualization(Image, Output, AHisto, hInfo.biWidth, hInfo.biHeight);
 	HistogramStretching(Image, Output, Histo, hInfo.biWidth, hInfo.biHeight);
+	//################################################################################
 	Threshold = GetThres(Low, High);
 	do {
 		ThresNext = GozalezBinThresh(Threshold, Histo, epsilon, Low, High);
 		diff = Threshold - ThresNext;
 		Threshold = ThresNext;
 	} while (diff > epsilon);
-
+	//################################################################################
 	Binarization(Image, Output, hInfo.biWidth, hInfo.biHeight, Threshold);
 	//InverseImage(Image, Output, hInfo.biWidth, hInfo.biHeight);
 	//BrightnessAdj(Image, Output, hInfo.biWidth, hInfo.biHeight, -120);
