@@ -104,7 +104,6 @@ double GonzalezBinThresh(BYTE* Img,int ImgSize, double Threshold, double epsilon
 		return Threshold;
 	}
 	GonzalezBinThresh(Img, ImgSize, ThresNext, epsilon);
-	return Threshold;
 }
 
 double GetInitThres(BYTE* Low, BYTE* High) {
