@@ -118,8 +118,16 @@ int main(){
 	BITMAPINFOHEADER hInfo; // 40BYTES
 	RGBQUAD hRGB[256]; // 1024BYTES
 	FILE* fp;
-	//fp = fopen("/workspace/computer_vision_1/computer_vision_1/coin.bmp", "rb");
-	fp = fopen("coin.bmp", "rb");
+
+	char ImgFilePath[200];
+	char OutputPath[200];
+
+	printf("ImgFilePath:    ");
+	scanf("%200s", ImgFilePath);
+	printf("OutputPath:    ");
+	scanf("%200s", OutputPath);
+
+	fp = fopen(ImgFilePath, "rb");
 	if (fp == NULL) {
 		printf("File not found!\n");
 		return -1;
@@ -150,8 +158,7 @@ int main(){
 
 	Binarization(Image, Output,ImgSize, Threshold);
 
-	//fp = fopen("/workspace/computer_vision_1/computer_vision_1/output.bmp", "wb");
-	fp = fopen("output.bmp", "wb");
+	fp = fopen(OutputPath, "wb");
 	fwrite(&hf, sizeof(BYTE), sizeof(BITMAPFILEHEADER), fp);
 	fwrite(&hInfo, sizeof(BYTE), sizeof(BITMAPINFOHEADER), fp);
 	fwrite(hRGB, sizeof(RGBQUAD), 256, fp);
