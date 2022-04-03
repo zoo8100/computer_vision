@@ -1,36 +1,38 @@
 #pragma warning(disable:4996)
 #include <stdio.h>
 #include <stdlib.h>
-typedef unsigned char BYTE;
-typedef unsigned short WORD;
-typedef unsigned int DWORD;
-typedef long LONG;
-typedef struct tagBITMAPFILEHEADER{
-WORD bfType;
-DWORD bfSize;
-WORD bfReserved1;
-WORD bfReserved2;
-DWORD bfoffBits;
-}BITMAPFILEHEADER;
-typedef struct tagBITMAPINFOHEADER{
-DWORD biSize;
-LONG biWidth;
-LONG biHeight;
-WORD biplanes;
-WORD biBitCount;
-DWORD biCompression;
-DWORD biSizeImage;
-LONG biXPelsPerMeter;
-LONG biYPelsPerMeter;
-DWORD biClrUsed;
-DWORD biClrImportant;
-}BITMAPINFOHEADER;
-typedef struct tagRGBQUAD{
-BYTE rgbBlue;
-BYTE rgbGreen;
-BYTE rgbRed;
-BYTE rgbReserved1;
-}RGBQUAD;
+#include <math.h>
+#include <Windows.h>
+//typedef unsigned char BYTE;
+//typedef unsigned short WORD;
+//typedef unsigned int DWORD;
+//typedef long LONG;
+//typedef struct tagBITMAPFILEHEADER{
+//WORD bfType;
+//DWORD bfSize;
+//WORD bfReserved1;
+//WORD bfReserved2;
+//DWORD bfoffBits;
+//}BITMAPFILEHEADER;
+//typedef struct tagBITMAPINFOHEADER{
+//DWORD biSize;
+//LONG biWidth;
+//LONG biHeight;
+//WORD biplanes;
+//WORD biBitCount;
+//DWORD biCompression;
+//DWORD biSizeImage;
+//LONG biXPelsPerMeter;
+//LONG biYPelsPerMeter;
+//DWORD biClrUsed;
+//DWORD biClrImportant;
+//}BITMAPINFOHEADER;
+//typedef struct tagRGBQUAD{
+//BYTE rgbBlue;
+//BYTE rgbGreen;
+//BYTE rgbRed;
+//BYTE rgbReserved1;
+//}RGBQUAD;
 
 void InverseImage(BYTE* Img, BYTE *Out, int W, int H)
 {
@@ -96,25 +98,24 @@ void ObtainAHistogram(int* Histo, int* AHisto)
 	fclose(fp);*/
 }
 
-void HistogramStretching(BYTE* Img, BYTE* Out, int * Histo, int W, int H)
+void HistogramStretching(BYTE* Img, BYTE* Out,BYTE* Low, BYTE* High, int * Histo, int W, int H)
 {
 	int ImgSize = W * H;
-	BYTE Low, High;
 
 	for (int i = 0; i < 256; i++) {
 		if (Histo[i] != 0) {
-			Low = i;
+			*Low = i;
 			break;
 		}
 	}
 	for (int i = 255; i >= 0; i--) {
 		if (Histo[i] != 0) {
-			High = i;
+			*High = i;
 			break;
 		}
 	}
 	for (int i = 0; i < ImgSize; i++) {
-		Out[i] = (BYTE)((Img[i] - Low) / (double)(High - Low) * 255.0);
+		Out[i] = (BYTE)((Img[i] - *Low) / (double)(*High - *Low) * 255.0);
 	}
 
 }
@@ -145,39 +146,46 @@ void Binarization(BYTE * Img, BYTE * Out, int W, int H, double Threshold)
 	}
 }
 //4���� ����
-
-double GozalezBinThresh(double Threshold, int * Histo, int epsilon, BYTE Low, BYTE High)
-{
-	//����
-	double low_sum=0, low_pixel_num=0, high_sum=0, high_pixel_num=0, G2Avg, G1Avg;
-	int ThresNext;
+double GonzalezBinThresh(BYTE* Img,int ImgSize, double Threshold, double epsilon) {
+	double ThresNext;
 	double diff;
-	double ThresDouble;
-	ThresDouble = (double)Threshold;
-
-	for (int i = (int)Low; i < Threshold; i++) {
-		if (Histo[i] != 0) {
-			printf("%d", i);
-			low_sum += i;
-			low_pixel_num += Histo[i];
+	double low_sum=0, high_sum=0;
+	double low_pixel_num=0, high_pixel_num=0;
+	double G2Avg, G1Avg;
+	printf("Threshold %f\n", Threshold);
+	for (int i = 0; i < ImgSize; i++) {
+		if (Img[i] > Threshold) {
+			//printf("GonzelzBinThresh Threshold value %d", Threshold);
+			high_sum += Img[i];
+			high_pixel_num++;
+		}
+		else if (Img[i] < Threshold){
+			low_sum += Img[i];
+			low_pixel_num++;
 		}
 	}
-	for (int i = (int)High; i > Threshold; i--) {
-		if (Histo[i] != 0) {
-			high_sum += i;
-			high_pixel_num += Histo[i];
-		}
-	}
+	printf("high_sum %f, low_sum %f, high_pixel_sum %f, low_pixel_sum %f\n", high_sum, low_sum, high_pixel_num, low_pixel_num);
 
 	G2Avg = low_sum / low_pixel_num;
 	G1Avg = high_sum / high_pixel_num;
-	ThresNext= (G2Avg + G1Avg) / 2;
-	return ThresNext;
+	ThresNext = (G2Avg + G1Avg) / 2;
+	diff = fabs(Threshold - ThresNext);
+	printf("diff %f\n", diff);
+	printf("Threshold %f\n", Threshold);
+	printf("ThresNext %f\n", ThresNext);
+	if (diff < epsilon) {
+		printf("%f\n", diff);
+		return Threshold;
+	}
+	else {
+		GonzalezBinThresh(Img, ImgSize, ThresNext, epsilon);
+	}
 }
 
-double GetThres(BYTE Low, BYTE High) {
+
+double GetInitThres(BYTE* Low, BYTE* High) {
 	double Thres;
-	Thres = (Low + High) / 2;
+	Thres = (double)(*Low + *High) / 2;
 	return Thres;
 }
 int main()
@@ -203,23 +211,18 @@ int main()
 	int Histo[256] = { 0 };
 	int AHisto[256] = { 0 };
 	int epsilon=3;
-	BYTE High=1;
-	BYTE Low=1;
+	BYTE * High = (BYTE*)malloc(1);
+	BYTE * Low = (BYTE*)malloc(1);
 	double Threshold;
-	double diff;
-	double ThresNext;
+	double ThresholdInit;
 	ObtainHistogram(Image, Histo, hInfo.biWidth, hInfo.biHeight);
 	ObtainAHistogram(Histo, AHisto);
 	HistogramEqualization(Image, Output, AHisto, hInfo.biWidth, hInfo.biHeight);
-	HistogramStretching(Image, Output, Histo, hInfo.biWidth, hInfo.biHeight);
-	//################################################################################
-	Threshold = GetThres(Low, High);
-	do {
-		ThresNext = GozalezBinThresh(Threshold, Histo, epsilon, Low, High);
-		diff = Threshold - ThresNext;
-		Threshold = ThresNext;
-	} while (diff > epsilon);
-	//################################################################################
+	HistogramStretching(Image, Output,Low, High, Histo, hInfo.biWidth, hInfo.biHeight);
+
+	ThresholdInit = GetInitThres(Low, High);
+	Threshold = GonzalezBinThresh(Image, ImgSize, ThresholdInit, epsilon);
+
 	Binarization(Image, Output, hInfo.biWidth, hInfo.biHeight, Threshold);
 	//InverseImage(Image, Output, hInfo.biWidth, hInfo.biHeight);
 	//BrightnessAdj(Image, Output, hInfo.biWidth, hInfo.biHeight, -120);
